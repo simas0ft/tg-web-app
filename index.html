@@ -4,27 +4,33 @@
     <meta charset="UTF-8">
     <script src="https://telegram.org"></script>
     <style>
-        body { font-family: sans-serif; padding: 15px; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
-        textarea { width: 100%; height: 250px; border-radius: 10px; border: 1px solid #555; padding: 10px; box-sizing: border-box; font-size: 16px; background: var(--tg-theme-secondary-bg-color); color: var(--tg-theme-text-color); outline: none; }
+        body { font-family: sans-serif; padding: 15px; background: var(--tg-theme-bg-color, #fff); color: var(--tg-theme-text-color, #000); }
+        textarea { width: 100%; height: 250px; border-radius: 10px; border: 1px solid #555; padding: 10px; box-sizing: border-box; font-size: 16px; background: var(--tg-theme-secondary-bg-color, #eee); color: var(--tg-theme-text-color, #000); outline: none; }
         button { width: 100%; padding: 15px; background: #248bcf; color: white; border: none; border-radius: 10px; margin-top: 15px; font-size: 16px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
-    <textarea id="textInput" placeholder="Загрузка текста..."></textarea>
+    <textarea id="textInput">Загрузка...</textarea>
     <button id="saveBtn">✅ СОХРАНИТЬ</button>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand(); 
 
+        // 1. Получаем параметры из URL
         const urlParams = new URLSearchParams(window.location.search);
         const textInput = document.getElementById("textInput");
 
-        // Извлекаем текст из параметра 'text' и декодируем его
+        // 2. Пробуем достать текст
         if (urlParams.has('text')) {
-            textInput.value = decodeURIComponent(urlParams.get('text'));
+            const rawText = urlParams.get('text');
+            textInput.value = decodeURIComponent(rawText);
+        } else {
+            textInput.value = ""; // Если текста нет в ссылке, оставляем пустым
+            textInput.placeholder = "Введите новый текст...";
         }
 
+        // 3. Отправка данных боту
         document.getElementById("saveBtn").addEventListener("click", () => {
             tg.sendData(textInput.value); 
             tg.close();
