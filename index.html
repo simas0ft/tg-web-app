@@ -1,81 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Telegram Editor</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <style>
-    body { font-family: Arial; padding: 20px; }
-    textarea { width: 100%; height: 300px; font-size: 16px; }
-    button { margin-top: 10px; padding: 10px 20px; }
-  </style>
+    <meta charset="UTF-8">
+    <script src="https://telegram.org"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+               padding: 15px; background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
+        textarea { width: 100%; height: 250px; border: 1px solid #ccc; border-radius: 10px; padding: 10px; 
+                   box-sizing: border-box; font-size: 16px; background: var(--tg-theme-secondary-bg-color); 
+                   color: var(--tg-theme-text-color); }
+        button { width: 100%; padding: 15px; background: #248bcf; color: white; border: none; 
+                 border-radius: 10px; margin-top: 15px; font-weight: bold; font-size: 16px; cursor: pointer; }
+    </style>
 </head>
-
 <body>
+    <textarea id="text_area" placeholder="Введите новый текст поста..."></textarea>
+    <button id="save_btn">СОХРАНИТЬ ПРАВКИ</button>
 
-<h2>Редактор поста</h2>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
 
-<textarea id="text"></textarea>
+        const urlParams = new URLSearchParams(window.location.search);
+        const msgId = urlParams.get('msg_id');
 
-<br>
-
-<button onclick="save()">💾 Сохранить</button>
-
-<script>
-const tg = window.Telegram.WebApp;
-
-// 🔥 ОБЯЗАТЕЛЬНО
-tg.ready();
-tg.expand();
-
-const params = new URLSearchParams(window.location.search);
-
-const chat_id = params.get("chat_id");
-const msg_id = params.get("msg_id");
-const text = params.get("text");
-
-// decode base64
-function dec(str) {
-    try {
-        return atob(str);
-    } catch {
-        return "";
-    }
-}
-
-// загрузка текста
-document.getElementById("text").value = dec(text || "");
-
-// 🔥 DEBUG
-console.log("WebApp loaded");
-console.log("initData:", tg.initData);
-
-function save() {
-    const newText = document.getElementById("text").value;
-
-    const payload = {
-        chat_id,
-        msg_id,
-        text: newText
-    };
-
-    console.log("SEND:", payload);
-
-    // 🔥 защита от “тихой отправки”
-    if (!tg.sendData) {
-        alert("Telegram WebApp not ready");
-        return;
-    }
-
-    tg.sendData(JSON.stringify(payload));
-
-    // даём Telegram время отправить
-    setTimeout(() => {
-        tg.close();
-    }, 200);
-}
-</script>
-
+        document.getElementById('save_btn').onclick = function() {
+            const newText = document.getElementById('text_area').value;
+            if (!newText) { alert("Текст не может быть пустым"); return; }
+            
+            // Отправляем данные боту
+            tg.sendData(JSON.stringify({msg_id: msgId, text: newText}));
+            tg.close();
+        };
+    </script>
 </body>
 </html>
