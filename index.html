@@ -30,20 +30,32 @@ const params = new URLSearchParams(window.location.search);
 
 const chat_id = params.get("chat_id");
 const msg_id = params.get("msg_id");
+const text = params.get("text");
+
+// 🔥 ДЕКОД BASE64
+function decodeBase64(str) {
+    try {
+        return atob(str);
+    } catch {
+        return "";
+    }
+}
+
+// ✔️ ВАЖНО: текст теперь всегда корректный
+document.getElementById("text").value = decodeBase64(text || "");
 
 function save() {
-    const text = document.getElementById("text").value;
+    const newText = document.getElementById("text").value;
 
     const payload = {
         chat_id,
         msg_id,
-        text
+        text: newText
     };
 
     console.log("SEND:", payload);
 
     tg.sendData(JSON.stringify(payload));
-
     tg.close();
 }
 </script>
