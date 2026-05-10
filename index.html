@@ -2,27 +2,13 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Telegram Web Editor</title>
-
+  <title>Telegram Editor</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    body {
-      font-family: Arial;
-      padding: 20px;
-    }
-
-    textarea {
-      width: 100%;
-      height: 300px;
-      font-size: 16px;
-    }
-
-    button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-    }
+    body { font-family: Arial; padding: 20px; }
+    textarea { width: 100%; height: 300px; }
+    button { margin-top: 10px; padding: 10px; }
   </style>
 </head>
 
@@ -30,7 +16,7 @@
 
 <h2>Редактор поста</h2>
 
-<textarea id="text" placeholder="Введите текст..."></textarea>
+<textarea id="text"></textarea>
 
 <br>
 
@@ -40,7 +26,6 @@
 const tg = window.Telegram.WebApp;
 tg.expand();
 
-// получаем параметры из URL
 const params = new URLSearchParams(window.location.search);
 const chat_id = params.get("chat_id");
 const msg_id = params.get("msg_id");
@@ -48,13 +33,16 @@ const msg_id = params.get("msg_id");
 function save() {
     const text = document.getElementById("text").value;
 
-    tg.sendData(JSON.stringify({
-        chat_id: chat_id,
-        msg_id: msg_id,
-        text: text,
+    const payload = {
+        chat_id,
+        msg_id,
+        text,
         initData: tg.initData
-    }));
+    };
 
+    console.log("SEND TO BOT:", payload);
+
+    tg.sendData(JSON.stringify(payload));
     tg.close();
 }
 </script>
