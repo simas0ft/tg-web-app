@@ -24,6 +24,9 @@
 
 <script>
 const tg = window.Telegram.WebApp;
+
+// 🔥 ОБЯЗАТЕЛЬНО
+tg.ready();
 tg.expand();
 
 const params = new URLSearchParams(window.location.search);
@@ -32,8 +35,8 @@ const chat_id = params.get("chat_id");
 const msg_id = params.get("msg_id");
 const text = params.get("text");
 
-// 🔥 ДЕКОД BASE64
-function decodeBase64(str) {
+// decode base64
+function dec(str) {
     try {
         return atob(str);
     } catch {
@@ -41,8 +44,12 @@ function decodeBase64(str) {
     }
 }
 
-// ✔️ ВАЖНО: текст теперь всегда корректный
-document.getElementById("text").value = decodeBase64(text || "");
+// загрузка текста
+document.getElementById("text").value = dec(text || "");
+
+// 🔥 DEBUG
+console.log("WebApp loaded");
+console.log("initData:", tg.initData);
 
 function save() {
     const newText = document.getElementById("text").value;
@@ -55,8 +62,18 @@ function save() {
 
     console.log("SEND:", payload);
 
+    // 🔥 защита от “тихой отправки”
+    if (!tg.sendData) {
+        alert("Telegram WebApp not ready");
+        return;
+    }
+
     tg.sendData(JSON.stringify(payload));
-    tg.close();
+
+    // даём Telegram время отправить
+    setTimeout(() => {
+        tg.close();
+    }, 200);
 }
 </script>
 
